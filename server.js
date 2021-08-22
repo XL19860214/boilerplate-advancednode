@@ -62,7 +62,7 @@ myDB(async client => {
   //
   app.route('/').get((req, res) => {
     // 
-    res.render(process.cwd() + '/views/pug/index', {
+    res.render('pug', {
       title: 'Connected to Database',
       message: 'Please login',
       showLogin: true
@@ -86,7 +86,7 @@ myDB(async client => {
 });
 
 app.post('/login', passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
-  res.render(process.cwd() + '/views/pug/profile');
+  res.redirect('/profile');
 });
 
 // -------------------------------------------------------------------
@@ -100,7 +100,9 @@ const ensureAuthenticated = (req, res, next) => {
 };
 
 app.get('/profile', ensureAuthenticated, (req, res) => {
-  res.render(process.cwd() + '/views/pug/profile');
+  res.render(process.cwd() + '/views/pug/profile', {
+    username: req.user.username
+  });
 });
 
 
