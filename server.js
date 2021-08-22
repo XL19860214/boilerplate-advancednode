@@ -44,31 +44,31 @@ app.use(passport.session());
 // -------------------------------------------------------------------
 // Authentication
 
-passport.use(new LocalStrategy(
-  (username, password, done) => {
-    myDataBase.findOne({ username: username }, (err, user) => {
-      console.log('User '+ username +' attempted to log in.');
-      if (err) { return done(err); }
-      if (!user) { return done(null, false); }
-      if (password !== user.password) { return done(null, false); }
-      return done(null, user);
-    });
-  }
-));
-
 myDB(async client => {
   const myDataBase = await client.db('database').collection('users');
 
-  // Be sure to change the title
+  passport.use(new LocalStrategy(
+    (username, password, done) => {
+      myDataBase.findOne({ username: username }, (err, user) => {
+        console.log('User '+ username +' attempted to log in.');
+        if (err) { return done(err); }
+        if (!user) { return done(null, false); }
+        if (password !== user.password) { return done(null, false); }
+        return done(null, user);
+      });
+    }
+  ));
+
+  //
   app.route('/').get((req, res) => {
-    //Change the response to render the Pug template
-    res.render('pug', {
+    // 
+    res.render(process.cwd() + '/views/pug/index', {
       title: 'Connected to Database',
-      message: 'Please login'
+      message: 'Please login',
+      showLogin: true
     });
   });
 
-  // Serialization and deserialization here...
   passport.serializeUser((user, done) => {
     done(null, user._id);
   });
@@ -79,11 +79,14 @@ myDB(async client => {
     });
   });
 
-  // Be sure to add this...
 }).catch(e => {
   app.route('/').get((req, res) => {
     res.render('pug', { title: e, message: 'Unable to login' });
   });
+});
+
+app.post('/login', passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+  res.render(process.cwd() + '/views/pug/profile');
 });
 
 
