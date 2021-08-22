@@ -4,15 +4,30 @@ const express = require('express');
 const myDB = require('./connection');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 
+// ===================================================================
+//
+
 const app = express();
 
+// ===================================================================
+//
+
 fccTesting(app); //For FCC testing purposes
+
+app.set('view engine', 'pug');
+
+// ===================================================================
+//
+
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ===================================================================
+//
+
 app.route('/').get((req, res) => {
-  res.render('Load your view here');
+  res.render(__dirname + '/views/pug/index.pug');
 });
 
 const PORT = process.env.PORT || 3000;
