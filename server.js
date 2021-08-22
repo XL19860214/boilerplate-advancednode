@@ -89,6 +89,20 @@ app.post('/login', passport.authenticate('local', { failureRedirect: '/' }), (re
   res.render(process.cwd() + '/views/pug/profile');
 });
 
+// -------------------------------------------------------------------
+// 
+
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+};
+
+app.get('/profile', ensureAuthenticated, (req, res) => {
+  res.render(process.cwd() + '/views/pug/profile');
+});
+
 
 // ===================================================================
 // 
