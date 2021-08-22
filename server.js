@@ -89,6 +89,11 @@ app.post('/login', passport.authenticate('local', { failureRedirect: '/' }), (re
   res.redirect('/profile');
 });
 
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+})
+
 // -------------------------------------------------------------------
 // 
 
@@ -108,6 +113,20 @@ app.get('/profile', ensureAuthenticated, (req, res) => {
 
 // ===================================================================
 // 
+
+// https://www.freecodecamp.org/learn/quality-assurance/advanced-node-and-express/logging-a-user-out
+// app.use((req, res, next) => {
+//   res.status(404)
+//     .type('text')
+//     .send('Not Found');
+// });
+
+app.all(/^\/.+/, (req, res) => {
+  // console.log(`req`, req); // DEBUG
+  res.status(404)
+     .type('text')
+     .send('Not Found');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
