@@ -25,25 +25,37 @@ const auth = (app, myDataBase) => {
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     callbackURL: 'https://boilerplate-advancednode.xl19860214.repl.co/auth/github/callback'
   },
-  (accessToken, refreshToken, profile, done) => {
-    // console.log(`profile`, profile); // DEBUG
-    myDataBase.findOne({ username: `github|${profile.id}` }, (err, user) => {
-      if (err || user) {
-        return done(err, user);
-      } else {
-        myDataBase.insertOne({
-          username: `github|${profile.id}`
-        }, (err, doc) => {
-          if (!err) {
-            console.log(doc.ops[0].username + ' is successfully registered throught GitHub.')
-            return done(null, doc.ops[0]);
+    (accessToken, refreshToken, profile, cb) => {
+      // console.log(`profile`, profile); // DEBUG
+      // LINK https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndUpdate/
+      myDataBase.findOneAndUpdate(
+        { id: profile.id },
+        {
+          $setOnInsert: {
+            id: profile.id,
+            name: profile.displayName || 'John Doe',
+            photo: profile.photos[0].value || '',
+            email: Array.isArray(profile.emails)
+              ? profile.emails[0].value
+              : 'No public email',
+            created_on: new Date(),
+            provider: profile.provider || ''
+          },
+          $set: {
+            last_login: new Date()
+          },
+          $inc: {
+            login_count: 1
           }
-          return done(null, false);
-        })
-      }
-    });
-  }
-));
+        },
+        { upsert: true, returnNewDocument: true },
+        (err, doc) => {
+          // console.log(`myDataBase.findOneAndUpdate::doc`, doc); // DEBUG
+          return cb(err, doc.value);
+        }
+      );
+    }
+  ));
 
   passport.serializeUser((user, done) => {
     // console.log(`passport.serializeUser::user`, user); // DEBUG
