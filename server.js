@@ -67,6 +67,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
   key: 'express.sid',
   secret: process.env.SESSION_SECRET,
+  store: store,
   resave: true,
   saveUninitialized: true,
   cookie: { secure: false }
@@ -89,6 +90,12 @@ myDB(async client => {
     console.log('A user has connected');
     currentUsers++;
     io.emit('user count', currentUsers);
+
+    io.emit('user', {
+      name: socket.request.user.name,
+      currentUsers,
+      connected: true
+    });
 
     socket.on('disconnect', () => {
       console.log('A user has disconnected');
