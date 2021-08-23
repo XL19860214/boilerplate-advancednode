@@ -69,10 +69,15 @@ const routes = (app, myDataBase) => {
     });
   });
 
+  app.get('/chat', ensureAuthenticated, (req, res) => {
+    res.render(process.cwd() + '/views/pug/chat', { user: req.user });
+  })
+
   app.get('/auth/github', passport.authenticate('github', { scope: [ 'user:email' ] }));
 
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
-    res.redirect('/profile');
+    req.session.user_id = req.user.id
+    res.redirect('/chat');
   });
 }
 
