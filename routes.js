@@ -75,6 +75,7 @@ const routes = (app, myDataBase) => {
 
   app.get('/auth/github', passport.authenticate('github', { scope: [ 'user:email' ] }));
 
+  // TODO Check client live revoke on Github
   app.route('/auth/github/callback').get(passport.authenticate('github', { failureRedirect: '/' }), (req, res) => {
     req.session.user_id = req.user.id
     res.redirect('/chat');

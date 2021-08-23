@@ -97,6 +97,15 @@ myDB(async client => {
       connected: true
     });
 
+    socket.on('chat message', data => {
+      console.log(`socket.on('chat message')`, 'New chat message');
+      console.log(`socket.on('chat message')::data`, data); // DEBUG
+      io.emit('chat message', {
+        name: socket.request.user.name,
+        message: data.message
+      });
+    });
+
     socket.on('disconnect', () => {
       console.log('A user has disconnected');
       currentUsers--;
@@ -104,7 +113,7 @@ myDB(async client => {
     });
   });
 
-
+  
 
   app.use((req, res, next) => {
     res.status(404)
