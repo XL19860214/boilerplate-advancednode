@@ -1,7 +1,7 @@
 const passport = require('passport');
 const { ObjectID } = require('mongodb');
 const LocalStrategy = require('passport-local');
-const GitHubStrategy = require('passport-github2');
+const GitHubStrategy = require('passport-github');
 const bcrypt = require('bcrypt');
 
 const auth = (app, myDataBase) => {
