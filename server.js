@@ -17,6 +17,8 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
+let currentUsers = 0;
+
 
 // ===================================================================
 // Configuration
@@ -54,6 +56,8 @@ myDB(async client => {
 
   io.on('connection', socket => {
     console.log('A user has connected');
+    currentUsers++;
+    io.emit('user count', currentUsers);
   });
 
   app.use((req, res, next) => {
